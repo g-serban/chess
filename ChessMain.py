@@ -20,26 +20,6 @@ def load_images():
         IMAGES[piece] = p.transform.scale(p.image.load('images/' + piece + '.png'), (SQ_SIZE, SQ_SIZE))
 
 
-# the main driver for our code
-# this will handle user input and updating the graphics
-def main():
-    p.init()
-    screen = p.display.set_mode(size=(HEIGHT, WIDTH))
-    clock = p.time.Clock()
-    screen.fill(p.Color('white'))
-    game_state = ChessEngine.GameState()
-    load_images()
-    running = True
-
-    while running:
-        for e in p.event.get():
-            if e.type == p.QUIT:
-                running = False
-        draw_game_state(screen, game_state)
-        clock.tick(MAX_FPS)
-        p.display.flip()
-
-
 # responsible for all the graphics within a current game state. The top left square is always light
 def draw_game_state(screen, game_state):
     draw_board(screen)  # draw squares on the board
@@ -63,6 +43,24 @@ def draw_pieces(screen, board):
             if piece != '--':  # not empty space
                 screen.blit(IMAGES[piece], p.Rect(column*SQ_SIZE, row*SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
+
+# the main driver for our code
+# this will handle user input and updating the graphics
+def main():
+    p.init()
+    screen = p.display.set_mode(size=(HEIGHT, WIDTH))
+    clock = p.time.Clock()
+    game_state = ChessEngine.GameState()
+    load_images()
+    running = True
+
+    while running:
+        for e in p.event.get():
+            if e.type == p.QUIT:
+                running = False
+        draw_game_state(screen, game_state)
+        clock.tick(MAX_FPS)
+        p.display.flip()
 
 
 if __name__ == '__main__':
