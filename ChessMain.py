@@ -61,16 +61,26 @@ def main():
     screen = p.display.set_mode(size=(HEIGHT, WIDTH))
     clock = p.time.Clock()
     game_state = ChessEngine.GameState()
+    valid_moves = game_state.get_valid_moves()
+    move_made = False  # flag variable
     load_images()
-    running = True
+
     sq_selected = ()  # no square is selected initially, keep track of the last click of the user  (row, col)
     player_clicks = []  # keep track of the player clicks  ex. [(6, 4), (4, 4)]  [0] being first click [1] being 2nd one
+    running = True
 
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
 
+            # key handler
+            elif e.type == p.KEYDOWN:
+                if e.key == p.K_z:  # undo when z is pressed
+                    game_state.undo_move()
+                    move_made = True
+
+            # mouse handler
             elif e.type == p.MOUSEBUTTONDOWN:
                 location = p.mouse.get_pos()  # x, y location of the mouse
 
@@ -81,19 +91,26 @@ def main():
                     sq_selected = ()  # deselect
                     player_clicks = []  # clear player clicks
 
-                else:
+                else:  # first click
                     sq_selected = (row, col)
                     player_clicks.append(sq_selected)
 
                 if len(player_clicks) == 2:  # after 2nd click
                     move = ChessEngine.Move(player_clicks[0], player_clicks[1], game_state.board)
-                    game_state.make_move(move)
+
+                    if move in valid_moves:
+                        game_state.make_move(move)
+                        move_made = True
 
                     if game_state.board[player_clicks[1][0]][player_clicks[1][1]] != '--':
                         print(move.get_chess_notation())
 
                     sq_selected = ()
                     player_clicks = []
+
+                if move_made is True:
+                    valid_moves = game_state.get_valid_moves()
+                    move_made = False
 
         draw_game_state(screen, game_state)
         position_highlighter(player_clicks, screen, game_state.board)
